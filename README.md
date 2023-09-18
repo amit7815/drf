@@ -1,6 +1,6 @@
 # Important Commands
-mkdir -p ~/dev/drf
-python3 -m venv venv
+mkdir -p ~/dev/drf<br>
+python3 -m venv venv<br>
 source venv/bin/activate
 pip freeze
 pip install -r requirements.txt
