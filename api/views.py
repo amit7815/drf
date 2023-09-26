@@ -5,6 +5,7 @@ from products.models import Product
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from products.serializers import ProductSerializer
 # def api_home(request, *args, **kwargs):
 #     # request --> HttpRequest instance from django 
 #     # request.body
@@ -53,16 +54,42 @@ from rest_framework.decorators import api_view
 #     return JsonResponse(data) # accepts dictionary as an argument
 #     # return HttpResponse(json_data_string, headers={"content-type":"application/json"}) # accepts string, by default content-type is html/text
 
-@api_view(["GET", "POST"])
-def api_home(request, *args, **kwargs):
-    """ 
-    django rest framework views and response
-    """
-    model_data = Product.objects.all().order_by("?").first() # create random query set and grab one of those value
+# @api_view(["GET", "POST"])
+# def api_home(request, *args, **kwargs):
+#     """ 
+#     django rest framework views and response
+#     """
+#     model_data = Product.objects.all().order_by("?").first() # create random query set and grab one of those value
 
-    data = {}
-    if model_data:
-        data = model_to_dict(model_data, fields=['id', 'title']) # fields is optional if we want to include specific fields otherwise all fields
-    #     json_data_string = json.dumps(data)
-    return Response(data) # accepts dictionary as an argument
-    # return HttpResponse(json_data_string, headers={"content-type":"application/json"}) # accepts string, by default content-type is html/text
+#     data = {}
+#     if model_data:
+#         data = model_to_dict(model_data, fields=['id', 'title']) # fields is optional if we want to include specific fields otherwise all fields
+#     #     json_data_string = json.dumps(data)
+#     return Response(data) # accepts dictionary as an argument
+#     # return HttpResponse(json_data_string, headers={"content-type":"application/json"}) # accepts string, by default content-type is html/text
+
+
+# @api_view(["GET", "POST"])
+# def api_home(request, *args, **kwargs):
+#     instance = Product.objects.all().order_by("?").first()
+#     data = {}
+#     if instance:
+#         data = ProductSerializer(instance).data
+#     return Response(data)
+
+# @api_view(["POST"])
+# def api_home(request, *args, **kwargs):
+#     data = request.data
+#     if instance:
+#         data = ProductSerializer(instance).data
+#     return Response(data)
+
+@api_view(["POST"])
+def api_home(request, *args, **kwargs):
+    breakpoint
+    serializer = ProductSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):  # for knowing the detailed error
+        print(serializer.data)
+        data = serializer.data
+        return Response(data)
+    return Response({"invalid": "not good data"}, status=404) 
