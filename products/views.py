@@ -4,6 +4,22 @@ from .serializers import ProductSerializer
 
 # Genreic API View
 
+class ProductCreateAPIView(generics.CreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+        title = serializer.validated_data.get("title")
+        # serializer.save()  when content is not present
+        content = serializer.validated_data.get("content") or None
+        if content is None:
+            content = title
+        serializer.save(content=content)    
+        # send a django signal
+
+product_create_view = ProductCreateAPIView.as_view()
+
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
