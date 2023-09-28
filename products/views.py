@@ -1,4 +1,4 @@
-from rest_framework import generics, mixins
+from rest_framework import authentication ,generics, mixins, permissions
 from .models import Product
 from .serializers import ProductSerializer 
 from rest_framework.decorators import api_view
@@ -45,6 +45,9 @@ product_detail_view = ProductDetailAPIView.as_view()   # we can do like this as 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # lookup_field = 'pk'
     # Product.objects.get(pk=15) here pk is look_up field
 
