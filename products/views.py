@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, mixins
 from .models import Product
 from .serializers import ProductSerializer 
 from rest_framework.decorators import api_view
@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 # Genreic API View
 
 # class ProductCreateAPIView(generics.CreateAPIView):
-#     queryset = Product.objects.all()
+#     queryset = Prodeleteduct.objects.all()
 #     serializer_class = ProductSerializer
 
 #     def perform_create(self, serializer):
@@ -78,6 +78,36 @@ class ProductDestroyAPIView(generics.DestroyAPIView):
 
 product_delete_view = ProductDestroyAPIView.as_view()
 
+class CreateApiView(mixins.CreateModelMixin, generics.GenericAPIView): #  this is our single create mixin view
+    pass
+
+class ProductMixinView(mixins.ListModelMixin, mixins.CreateModelMixin ,mixins.RetrieveModelMixin ,generics.GenericAPIView): # with the help of ListModelMixin we can use list method here and in generic ListAPIView or any view this is implemented by default
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs): # HTTP --> GET
+        print(args, kwargs)
+        pk = kwargs.get("pk")
+        if pk is not None:
+            return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+        title = serializer.validated_data.get("title")
+        # serializer.save()  when content is not present
+        content = serializer.validated_data.get("content") or None
+        if content is None:
+            content = title
+        serializer.save(content=content)
+        
+
+product_mixin_view = ProductMixinView.as_view()
 
 
 @api_view(['GET', 'POST'])
